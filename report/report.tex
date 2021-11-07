@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\Huge
+\title{\Huge Artificial Intelligence II}
+
+\author{\LARGE Nefeli Tavoulari}
+\date{\LARGE Fall Semester 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{}\Large The Mean Squared Error loss function is defined as:\\ \\
+ $\mathcal{MSE} $ =  $\frac{1}{m}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
+ Calculating the gradient of MSE, we can find out the parameters which minimize the loss. \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ =  $\nabla_{\!\mathbf{w}}\frac{1}{m}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
+The features $x_i$ and the predicted values $y_i$ can be considered as constants, since the gradient is with respect to w, which is the model’s parameter vector. \\ (scalar multiplication rule) \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ =  $\frac{1}{m}\nabla_{\!\mathbf{w}}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
+Then, assuming we only have one instance (x,y) and using the power rule and the chain rule for derivatives: \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\nabla_{\!\mathbf{w}}$$(h_w(x) - y)^2$ \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)\nabla_{\!\mathbf{w}}$$(h_w(x) - y)$ \\ \\
+where $h_w(x) = w_0x_0 + ... + w_nx_n = w^Tx: \textbf{(*)}$\\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)\nabla (w_0x_0 + ... + w_nx_n - y)  $ \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(\frac{\partial (w_0x_0 + ... + w_nx_n - y)}{\partial w_0} , ... , \frac{\partial (w_0x_0 + ... + w_nx_n - y)}{\partial w_n}) $ \\ \\ 
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(x_0 , ... , x_n)$ \\ \\ 
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(x)$ \\ \\ 
+so, from \textbf{(*)}:\\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(w^Tx - y)$$(x)$   \\ \\ 
+which equals to the following vector: \\ \\
+$
+\begin{bmatrix}
+2(w^Tx - y)(x_0)\\
+. . .\\             
+2(w^Tx - y)(x_n)\\
+\end{bmatrix}
+$ \\ \\
+Now, for m training instances: \\ \\ 
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\frac{2}{m}\sum_{i=1}^{m}(h_w(x_i) - y_i)\nabla_{\!\mathbf{w}}$$(h_w(x_i) - y_i)$ \\ \\
+$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\begin{bmatrix}
+\frac{2}{m}(w^Tx_1 - y_1)(x_1,_0) + ... + \frac{2}{m}(w^Tx_m - y_m)(x_m,_0) \\
+. . .\\             
+\frac{2}{m}(w^Tx_1 - y_1)(x_1,_n) + ... + \frac{2}{m}(w^Tx_m - y_m)(x_m,_n)\\
+\end{bmatrix}
+$ \\ \\ 
+So: $\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\frac{2}{m}$(X$^T$(Xw - y)).
+
+\end{document}
