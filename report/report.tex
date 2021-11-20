@@ -6,7 +6,7 @@
 \usepackage{amsmath}
 \author{\LARGE Nefeli Tavoulari}
 \date{\LARGE Fall Semester 2021}
-
+\usepackage{hyperref}
 \begin{document}
 
 \maketitle
@@ -45,67 +45,93 @@ $\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\begin{bmatrix}
 $ \\ \\ 
 So: $\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\frac{2}{m}$(X$^T$(Xw - y)).
 \section{Vaccine Sentiment Classification}
-In this notebook I trained a multinomial Logistic Regression classifier, which classifies tweets as Neutral, Pro-vax or Anti-vax.
-\subsection{Pre-processing}
-First of all, I performed some pre-processing and feature extraction on the data. I removed all empty or duplicate tweets, as they offer no useful information to the model, I lowercased tweets, performed lemmatization, removed stopwords, special characters, emojis, words written in a non-latin alphabet, urls and twitter accounts, in order for the model to focus on important and linguistically meaningful words, instead of noise. Also, I experimented with stemmers (Porter, Lancaster, Snowball), but I noticed that the Wordnet Lemmatizer performed much better than all of them, so I did not include these tests in the notebook at all. In general, what I understood by my research is that lemmatization provides better results at times, because it performs an analysis that depends on the word's part-of-speech and produces real, dictionary words, in contrast with stemming. \\ \\
+In this notebook I trained a multinomial Logistic Regression model, which classifies tweets as Neutral, Pro-vax or Anti-vax.
+\subsection{Dataset}
+The given dataset consists of two columns. The one column represents the tweets text and the other one the corresponding label (0, 1, 2 / neutral,anti-vax,pro-vax). Also, the dataset is rather imabalanced, since the anti-vax instances are almost 3 times fewer ,in comparison with the other classes. One conclusion we might reach out of it, is the fact that accuracy is probably not the right metric to evaluate our model.
+\subsection{Preprocessing}
+First of all, I performed some pre-processing and feature extraction on the data. I removed all empty or duplicate tweets, as they offer no useful information to the model, I lowercased tweets, performed lemmatization, removed stopwords, special characters, emojis, words written in a non-latin alphabet, urls and twitter accounts, in order for the model to focus on important and linguistically meaningful words, instead of noise. Also, I experimented with stemmers :
+\begin{itemize}
+    \item Porter (removes common endings of words)
+    \item Lancaster (more aggressive)
+    \item Snowball (better version of Porter)
+\end{itemize} but I noticed that the Wordnet Lemmatizer performed much better than all of them, so I have commented out the lines that correspond to the stemmers in the notebook. In general, what I understood by my research is that lemmatization provides better results at times, because it performs a vocabulary and morphological analysis of the words and produces real, dictionary words, in contrast with stemming. \\ \\
 The results I took from Stemming and Lemmatization, using CountVectorizer with TfidfTransformer and multinomial Logistic Regression on training and test data: \\ \\
 \begin{Vmatrix}
 & Porter & Lancaster & Snowball & Lemmatizer\\
-Recall & 0.8203 & 0.8129 & 0.8194 & \textbf{0.8376}\\
-Precision & 0.824 & 0.816 & 0.8231 &  \textbf{0.8417}\\
-F1 & 0.8136 & 0.8068 & 0.8127 & \textbf{0.832}\\
-Accuracy & 0.8203 &	0.8129 & 0.8194 & \textbf{0.8376} \\
+Recall & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377}\\
+Precision & 0.8214 & 0.8165 & 0.8210 &  \textbf{0.8377}\\
+F1 & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377}\\
+Accuracy & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377} \\
 \end{Vmatrix}
 \\ \\ \\
 \begin{Vmatrix}
 & Porter & Lancaster & Snowball & Lemmatizer\\
-Recall & 0.7191 & 0.7142 & 0.7212 & \textbf{0.7243}\\
-Precision & 0.7156 & 0.7145 & 0.7189 & \textbf{0.7205}\\
-F1 & 0.7108	& 0.7080 & 0.7135 & \textbf{0.7175}\\
-Accuracy & 0.7191 &	0.7142 & 0.7212 & \textbf{0.7243} \\
-\end{Vmatrix}
-\\ \\ 
-\subsection{Feature Extraction}
-Then, I vectorized and calculated TF-IDF on the textual data, so as to perform Logistic Regression. For this task, I tried out CountVectorizer with TfidfTransformer, HashingVectorizer with TfidfTransformer and TfidfVectorizer.
-The HashingVectorizer did not perform as well as the others and TfidfVectorizer had slightly better results in the testing, while CountVectorizer has better results in the training.  \\ \\
-The results on both training and testing data: \\ \\
-\begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-Recall & \textbf{0.8376} & 0.8282 & 0.8371\\
-Precision & \textbf{0.8417} & 0.8322 & 0.8410\\
-F1 &  \textbf{0.8320} & 0.8224 & 0.8317\\
-Accuracy & \textbf{0.8376} &	0.8282 &  0.8371 \\
+Recall & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
+Precision & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
+F1 & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
+Accuracy & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177} \\
 \end{Vmatrix}
 \\ \\ \\
+We observe here that the Snowball Stemmer really is a better version of the Porter Stemmer.
+The Lemmatizer is the best solution though and so, from now on, this is the one I will be using.
+\subsection{Feature Extraction}
+Then, I vectorized and calculated TF-IDF on the textual data, so as to perform Logistic Regression. For this task, I tried out :
+\begin{itemize}
+\item CountVectorizer with TfidfTransformer, (computes word counts, IDF values and TF-IDF scores)
+\item HashingVectorizer with TfidfTransformer, (uses hashing to find the token string name to feature integer index mapping)
+\item TfidfVectorizer ( = CountVectorizer + TfidfTransformer)
+\end{itemize}
+The results on both training and testing data using multinomial Logistic Regression: \\ \\
 \begin{Vmatrix}
 & CountVec & HashingVec & TfidfVec\\
-Recall & 0.7243 & 0.7169 & \textbf{0.7265}\\
-Precision & 0.7205 & 0.7162 & \textbf{0.7262}\\
-F1 &  0.7175 &	0.7083 &	\textbf{0.7203}\\
-Accuracy & 0.7243 &	0.7169 & \textbf{0.7265}\\
-\end{Vmatrix} \\ \\
-\subsection{Scaling}
-I would also like to note that I experimented with MinMaxScaler and StandardScaler with Logistic Regression, and even though the training accuracy was very high (greater than 0.9), the test accuracy was lower than without scaling, so I assume that it is overfitting and I removed the scaler. \\ \\
-Finally, using different metrics, precision, recall, f1, accuracy, confusion matrix, I was able to see the quality of my model.
-\subsection{Plots}
-I have added some plot where the most important/rare words are presented.
-Also, I have a learning curve plot, where we can see that the model is not overfitting.
+Recall & 0.8377 & 0.8287 & 0.8377\\
+Precision & 0.8377 & 0.8287 & 0.8377\\
+F1 &  0.8377 & 0.8287 & 0.8377\\
+Accuracy & 0.8377 & 0.8287 & 0.8377\\
+\end{Vmatrix} \\ \\ \\
+\begin{Vmatrix}
+& CountVec & HashingVec & TfidfVec\\
+Recall & 0.7177 & 0.7169 & 0.7177\\
+Precision & 0.7177 & 0.7169 & 0.7177\\
+F1 & 0.7177 & 0.7169 & 0.7177\\
+Accuracy & 0.7177 & 0.7169 & 0.7177\\
+\end{Vmatrix} \\ \\ \\
+We observe that the HashingVectorizer did not perform as well as the others. We also observe that the model might be overfitting, since the training score is quite higher than the test score. Thus, I performed some hyperparameter tuning, in order to improve the performance and avoid overfitting. \\ \\
+For the \textbf{CountVectorizer}, I added max\_df and min\_df, in order to exclude some extremely rare or extremely used words, since they offer nothing but noise to the model. For the same reason, I also added the stopwords option (even though I had already done it manually in preprocessing). In this way, words like "the" or "asdfgh" are removed and that improves the performance of the model. Also, I added some regularization to the Logistic Regression model(C=1.5).\\ \\
+For the \textbf{HashingVectorizer}, I added the stopwords option and enabled unigrams and bigrams also. Moreover, I added some regularization to the Logistic Regression model(C=1.9), elasticnet penalty, saga solver and l1\_ratio.\\ \\
+For the \textbf{TfIdfVectorizer}, I added the same parameters as for the CountVectorizer.\\ \\
+After hyperparameter tuning: \\ \\
+\begin{Vmatrix}
+& CountVec & HashingVec & TfidfVec\\
+Recall & 0.7643 & \textbf{0.8535} & 0.7643\\
+Precision & 0.7643 & \textbf{0.8535} & 0.7643\\
+F1 & 0.7643 & \textbf{0.8535} & 0.7643\\
+Accuracy & 0.7643 &	\textbf{0.8535} & 0.7643\\
+\end{Vmatrix} \\ \\ \\
+\begin{Vmatrix}
+& CountVec & HashingVec & TfidfVec\\
+Recall & 0.7230 & \textbf{0.7296} & 0.7230 \\
+Precision & 0.7230 & \textbf{0.7296} & 0.7230\\
+F1 & 0.7230 & \textbf{0.7296} &	0.7230\\
+Accuracy & 0.7230 &	\textbf{0.7296} & 0.7230\\
+\end{Vmatrix} \\ \\ \\
+In general we observe that the training scores got worse than before hyperparameter tuning, but the test scores, which we are more interested in, were improved and that after all, the Hashing Vectorizer performs better than the others.
 
-\subsection{Classifiers}
-Finally, I experimented with some other classifiers as well, in order to check whether the results will be any improved, in comparison with multinomial Logistic Regression. \\ \\  \\ The results are the following, using TfidfVectorizer for both training and test data: \\ \\
-\begin{Vmatrix}
-& Decision Tree & MLP & BernoulliNB\\
-Recall  &	0.9937 &	0.9935 &	0.7883\\
-Precision & 0.9937 &	0.9935 &	0.8\\
-F1 &  0.9937 &	0.9935 &	0.7779\\
-Accuracy & 0.9937 &	0.9935 &	0.7883\\
-\end{Vmatrix} \\ \\ \\
-\begin{Vmatrix}
-& Decision Tree & MLP & BernoulliNB\\
-Recall  & 0.6599 &	0.6148 & 0.695\\
-Precision & 0.6581 & 0.6201 & 0.7087\\
-F1 & 0.658 & 0.6168 & 0.6807\\
-Accuracy & 0.6599 & 0.6148 & 0.695\\
-\end{Vmatrix} \\ \\ \\
-They did not perform well and I assume that there is a good chance they are overfitting.
+\subsection{More experiments}
+I would also like to note that I experimented with RobustScaler and StandardScaler with Logistic Regression, but the results got worse in both cases, so I commented them out. \\ \\
+Furthermore,I experimented with some other classifiers, to see whether the results would get any ameliorated.
+
+\subsection{Evaluation}
+In a multi-class classification setup, micro-average is preferable if you suspect there might be class imbalance
+Another thing we might observe is that "micro-F1 = micro-precision = micro-recall = accuracy" and 
+Moreover, using different metrics, precision, recall, f1, accuracy, confusion matrix, I was able to see the quality of my model. From the confusion matrix, I understand that my model does not predict that well the anti-vaxers, but that is probably because the anti-vaxers in the data are very few, in comparison to the other classes.
+\subsection{Plots}
+I have added some plots where the most important/rare words are presented.
+Also, I have a learning curve plot, where we can see that the model is not overfitting.
+\subsection{In this assignment, I had the opportunity to familiarize with the concepts of data pre-processing, extraction, vectorization, visualization, but also with the process of making plenty of tests and research, in order to achieve the best result.}
+\begin{thebibliography}{9}
+\bibitem{}
+\url{https://kavita-ganesan.com/tfidftransformer-tfidfvectorizer-usage-differences/#.YZPe0mBBwuV}
+\end{thebibliography}
+
 \end{document}
