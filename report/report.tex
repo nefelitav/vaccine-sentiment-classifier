@@ -18,155 +18,169 @@
 
 \maketitle
 
-\section{}\Large The Mean Squared Error loss function is defined as:\\ \\
- $\mathcal{MSE} $ =  $\frac{1}{m}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
- Calculating the gradient of MSE, we can find out the parameters which minimize the loss. \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ =  $\nabla_{\!\mathbf{w}}\frac{1}{m}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
-The features $x_i$ and the predicted values $y_i$ can be considered as constants, since the gradient is with respect to w, which is the model’s parameter vector. \\ (scalar multiplication rule) \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ =  $\frac{1}{m}\nabla_{\!\mathbf{w}}$ $\sum_{i=1}^{m}(h_w(x_i) - y_i)^2$ \\ \\
-Then, assuming we only have one instance (x,y) and using the power rule and the chain rule for derivatives: \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\nabla_{\!\mathbf{w}}$$(h_w(x) - y)^2$ \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)\nabla_{\!\mathbf{w}}$$(h_w(x) - y)$ \\ \\
-where $h_w(x) = w_0x_0 + ... + w_nx_n = w^Tx: \textbf{(*)}$\\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)\nabla (w_0x_0 + ... + w_nx_n - y)  $ \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(\frac{\partial (w_0x_0 + ... + w_nx_n - y)}{\partial w_0} , ... , \frac{\partial (w_0x_0 + ... + w_nx_n - y)}{\partial w_n}) $ \\ \\ 
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(x_0 , ... , x_n)$ \\ \\ 
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(h_w(x) - y)$$(x)$ \\ \\ 
-so, from \textbf{(*)}:\\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $2(w^Tx - y)$$(x)$   \\ \\ 
-which equals to the following vector: \\ \\
+\section{}\Large The Cross Entropy loss function for one instance is defined as:\\ \\
+ $\mathcal{J}(y,\hat{y}) $ =  - $\sum_{k=1}^{K}(y_k\log (\hat{y}_k ))$\\ \\
+ where K is the number of classes and $\hat{y}$ is the softmax function. \\ \\
+ Calculating the derivative of Cross Entropy with respect to the logit j:\\ \\
+$\frac{ \partial\mathcal{J}}{\partial\mathcal{\theta}_j} $ =  $-\frac{ \partial\mathcal{}}{\partial\mathcal{\theta}_j}$ $\sum_{k=1}^{K}(y_k\log (\hat{y}_k ))$  \\ \\ 
+$\frac{ \partial\mathcal{J}}{\partial\mathcal{\theta}_j} $ =   $-\sum_{k=1}^{K}y_k\frac{ \partial\mathcal{}}{\partial\mathcal{\theta}_j}\log \hat{y}_k $ , where:\\ \\
+$\log \hat{y}_k = \log (\frac{e^\theta_i}{\sum_{k=1}^{K}e^\theta_k}) = 
+\theta_i - \log ({\sum_{k=1}^{K}e^\theta_k})$ \\ \\
+Now: \\ \\
+$\frac{\partial (\theta_i - \log ({\sum_{k=1}^{K}e^\theta_k}))} {\partial \theta_j} = \frac{\partial \theta_i}{\partial \theta_j} -
+\frac{1}{\sum_{k=1}^{K}e^\theta_k}* \frac{\partial \sum_{k=1}^{K}e^\theta_k }{\partial \theta_j} = \\ \\
+- \frac{e^\theta_i}{\sum_{k=1}^{K}e^\theta_k} + \frac{\partial \theta_i}{\partial \theta j} = - \hat{y} + \frac{\partial \theta_i}{\partial \theta j}$ , where, \\ \\ if j=i then $\frac{\partial \theta_i}{\partial \theta_j} = 1,$ otherwise $\frac{\partial \theta_i}{\partial \theta} = 0$ \\ \\
+So, $\frac{ \partial\mathcal{J}}{\partial\mathcal{\theta}_j} =  -\sum_{k=1}^{K}y_k(\{i==k\} - \hat{y})\\ \\ =  -\sum_{k=1}^{K}y_k\{i==k\} +\sum_{k=1}^{K}y_k\hat{y}\\ \\  = -y_j +\sum_{k=1}^{K}y_k\hat{y}\\ \\ = 
+-y_j +\hat{y}\sum_{k=1}^{K}y_k \\ \\ =
+-y_j +\hat{y}\sum_{k=1}^{K}y_k \\ \\ =
+-y_j +\hat{y} \\ \\
 $
-\begin{bmatrix}
-2(w^Tx - y)(x_0)\\
-. . .\\             
-2(w^Tx - y)(x_n)\\
-\end{bmatrix}
-$ \\ \\
-Now, for m training instances: \\ \\ 
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\frac{2}{m}\sum_{i=1}^{m}(h_w(x_i) - y_i)\nabla_{\!\mathbf{w}}$$(h_w(x_i) - y_i)$ \\ \\
-$\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\begin{bmatrix}
-\frac{2}{m}(w^Tx_1 - y_1)(x_1,_0) + ... + \frac{2}{m}(w^Tx_m - y_m)(x_m,_0) \\
-. . .\\             
-\frac{2}{m}(w^Tx_1 - y_1)(x_1,_n) + ... + \frac{2}{m}(w^Tx_m - y_m)(x_m,_n)\\
-\end{bmatrix}
-$ \\ \\ 
-So: $\nabla_{\!\mathbf{w}}\mathcal{MSE} $ = $\frac{2}{m}$(X$^T$(Xw - y)).
-\section{Vaccine Sentiment Classification}
-In this notebook I trained a multinomial(softmax) Logistic Regression model, which classifies tweets as Neutral, Pro-vax or Anti-vax.
-\subsection{Dataset}
-The given dataset consists of two columns. The one column represents the tweets text and the other one the corresponding label (0, 1, 2 / neutral,anti-vax,pro-vax). Also, the dataset is rather imabalanced, since the anti-vax instances are almost 3 times fewer ,in comparison with the other classes. One conclusion we might reach out of it, is the fact that accuracy is probably not the right metric to evaluate our model.
-\subsection{Preprocessing}
-First of all, I performed some preprocessing and feature extraction on the data. I removed all empty or duplicate tweets, as they offer no useful information to the model, I lowercased tweets, performed lemmatization, removed stopwords, special characters, emojis, words written in a non-latin alphabet, urls and twitter accounts, in order for the model to focus on important and linguistically meaningful words, instead of noise. Also, I experimented with stemmers :
-\begin{itemize}
-    \item Porter (removes common endings of words)
-    \item Lancaster (more aggressive)
-    \item Snowball (better version of Porter)
-\end{itemize} but I noticed that the Wordnet Lemmatizer performed much better than all of them, so I have commented out the lines that correspond to the stemmers in the notebook. In general, what I understood by my research is that lemmatization provides better results at times, because it performs a vocabulary and morphological analysis of the words and produces real, dictionary words, in contrast with stemming. The results I took from Stemming and Lemmatization, using CountVectorizer with TfidfTransformer and multinomial Logistic Regression on training and validation data: \\ \\
-\begin{Vmatrix}
-& Porter & Lancaster & Snowball & Lemmatizer\\
-Recall & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377}\\
-Precision & 0.8214 & 0.8165 & 0.8210 &  \textbf{0.8377}\\
-F1 & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377}\\
-Accuracy & 0.8214 & 0.8165 & 0.8210 & \textbf{0.8377} \\
-\end{Vmatrix}
-\\ \\ \\
-\begin{Vmatrix}
-& Porter & Lancaster & Snowball & Lemmatizer\\
-Recall & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
-Precision & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
-F1 & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177}\\
-Accuracy & 0.7094 & 0.7085 & 0.7112 & \textbf{0.7177} \\
-\end{Vmatrix}
-\\ \\ \\
-We observe here that the Snowball Stemmer really is a better version of the Porter Stemmer.
-The Lemmatizer is the best solution though and so, from now on, this is the one I will be using.
-\subsection{Feature Extraction}
-Then, I vectorized and calculated TF-IDF on the textual data, so as to perform Logistic Regression. For this task, I tried out :
-\begin{itemize}
-\item CountVectorizer with TfidfTransformer, (computes word counts, IDF values and TF-IDF scores)
-\item HashingVectorizer with TfidfTransformer, (uses hashing to find the token string name to feature integer index mapping)
-\item TfidfVectorizer (CountVectorizer + TfidfTransformer)
-\end{itemize}
-An advantage of HashingVectorizer is that it does not store the resulting vocabulary and so, it is very low memory cost. However, there can be collisions, because of string hashing, which is not a problem if the number of features is large enough.The results on both training and  data using multinomial Logistic Regression: \\ \\
-\begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-Recall & 0.8377 & 0.8287 & 0.8377\\
-Precision & 0.8377 & 0.8287 & 0.8377\\
-F1 &  0.8377 & 0.8287 & 0.8377\\
-Accuracy & 0.8377 & 0.8287 & 0.8377\\
-\end{Vmatrix} \\ \\ \\
-\begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-Recall & 0.7177 & 0.7169 & 0.7177\\
-Precision & 0.7177 & 0.7169 & 0.7177\\
-F1 & 0.7177 & 0.7169 & 0.7177\\
-Accuracy & 0.7177 & 0.7169 & 0.7177\\
-\end{Vmatrix} \\ \\ \\
-We observe that the HashingVectorizer did not perform as well as the others. We also observe that the model might be overfitting, since the training score is quite higher than the validation score. Thus, I performed some hyperparameter tuning, trying plenty of different combinations in order to improve the performance and avoid overfitting. \\ \\
-For the \textbf{CountVectorizer}, I added max\_df and min\_df, in order to exclude some extremely rare or extremely used words, since they offer nothing but noise to the model. For the same reason, I also added the stopwords option (even though I had already done it manually in preprocessing). In this way, words, such as "the" or "asdfgh" are removed and that improves the performance of the model. Also, I added some regularization to the Logistic Regression model(C=1.5), in order to tell the model that the data might not be fully representative of the real world data.\\ \\
-For the \textbf{HashingVectorizer}, I added the stopwords option and enabled unigrams and bigrams also. Moreover, I added some regularization to the Logistic Regression model(C=1.9), elasticnet penalty, saga solver and l1\_ratio. Elastic net regression is a combination of ridge and lasso regression. It shrinks some coefficients towards zero (like ridge regression) and set some coefficients to exactly zero (like lasso regression). Saga solver performs well for sparse multinomial logistic regression,it allows for L1 regularization and it is ,in general, faster than sag. L1 ratio determines whether the penalty is a combination of L1 and L2. Finally, I set the number of features equal to  $2^{16}$, because that gave me the higher score, probably because it avoids collision).  \\ \\
-For the \textbf{TfIdfVectorizer}, I added the same parameters as for the CountVectorizer.\\ \\
-In this way, I handled overfitting.After hyperparameter tuning: \\ \\
-\begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-Recall & 0.7643 & \textbf{0.8030} & 0.7643\\
-Precision & 0.7643 & \textbf{0.8030} & 0.7643\\
-F1 & 0.7643 & \textbf{0.8030} & 0.7643\\
-Accuracy & 0.7643 &	\textbf{0.8030} & 0.7643\\
-\end{Vmatrix} \\ \\
-\begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-Recall & 0.7230 & \textbf{0.7353} & 0.7230 \\
-Precision & 0.7230 & \textbf{0.7353} & 0.7230\\
-F1 & 0.7230 & \textbf{0.7353} &	0.7230\\
-Accuracy & 0.7230 &	\textbf{0.7353} & 0.7230\\
-\end{Vmatrix} \\ \\
-In general we observe that the training scores got worse than before hyperparameter tuning, but the validation scores, which we are more interested in, were improved. After all, the Hashing Vectorizer performs better than the others, but there is a good chance that this model is still overfitting. 
-\subsection{Evaluation}
+since the one-hot encoded vector y has a sum equal to 1. \\ \\
+So, $\frac{ \partial\mathcal{J}}{\partial\mathcal{\theta}}
+= \hat{y} - y$ and the same applies if we have m instances. In that case $\hat{y} - y$ is a vector.
+\section{}
+Following the stages of the computational graph we get: \\ \\
+$a = x*m + b \\ 
+y = RELU(a) = max(0, a) = max(0, x*m + b) \\ 
+f = LOSS = (y-y*)^2 = (max(0, a) - y*)^2 = (max(0, x*m + b) - y*)^2$ \\ \\
+So, now I have to compute the gradients with respect to x,m,b,y*: \\ \\
+$\frac {\partial x}{\partial x} = \frac {\partial m}{\partial m} = \frac {\partial b}{\partial b} = \frac {\partial y*}{\partial y*} = 1 \\ \\$
+$\frac {\partial a}{\partial x} = m $
+$\frac {\partial a}{\partial m} = x $ 
+$\frac {\partial a}{\partial b} = 1 $
+$\frac {\partial a}{\partial y*} = 0 $
 \\ \\
-Using different metrics, precision, recall, f1 score, accuracy, confusion matrix, roc auc, I was able to determine the quality of my model. From the confusion matrix, I understand that my model makes good enough predictions, since the diagonal has quite bigger numbers. I observe also that it does not predict that well the anti-vaxers, but that is expected, because the anti-vaxers in the data are very few, in comparison to the other classes. \\The confusion matrix ,using the Count Vectorizer :
-\begin{center}
-\includegraphics{confusion_matrix}
-\end{center}
-Also, I would like to note that in a multi-class classification setup, micro-average is preferable if you suspect there might be class imbalance. Furthermore, micro-F1 = micro-precision = micro-recall = accuracy and TfIdfVectorizer has the same performance as the CountVectorizer with TfIdfTransformer.
-So, our results seem normal.
-As far as the ROC AUC is concerned, it is a metric that tells us how much the model is capable of distinguishing between classes. \\ The results I took were the following: \\ \\
+Using the chain rule: \\ \\
+$\frac {\partial y}{\partial x} = \frac {\partial max(0,a)}{\partial x} = 0$ or $m$ $(=\frac {\partial a}{\partial x}) $
+\\ \\
+$\frac {\partial y}{\partial m} = 0$ or $x$ $(=\frac {\partial a}{\partial m})$ 
+\\ \\
+$\frac {\partial y}{\partial b} = 0$ or $1$ $(=\frac {\partial a}{\partial b})$ 
+\\ \\
+$\frac {\partial y}{\partial y*} = 0$
+\\ \\ 
+$\frac {\partial f}{\partial x} = \frac {\partial (max(0,a)-y*)^2}{\partial x} =  \frac {2*\partial (max(0,a)-y*)}{\partial x}*\frac{\partial y}{\partial x} = \\ \\ 0$ or $2*(x*m+b-y*)*\frac {\partial a}{\partial x} = 2*(x*m+b-y*)*m $
+\\ \\
+$\frac {\partial f}{\partial m} = 0$ or $ 2*(x*m + b -y*)*\frac {\partial a}{\partial m} = 2*(x*m + b -y*)*x$ 
+\\ \\
+$\frac {\partial f}{\partial b} = 0$ or $2*(x*m + b -y*)*\frac {\partial a}{\partial b} = 2*(x*m +b-y*)$ 
+\\ \\
+$\frac {\partial f}{\partial y*} = 0$ or $2*(x*m + b -y*)*\frac {-\partial y*}{\partial y*} = -2(x*m + b -y*)$
+\\ \\ \\
+(0 if y = 0)
+\newpage
+\section{Vaccine Sentiment Classification}
+In this notebook I trained a neural network, which classifies tweets as Neutral, Pro-vax or Anti-vax.
+\subsection{Preprocessing}
+First of all, I performed some preprocessing and feature extraction on the data, similar to the one I had done in the previous assignment. I removed all empty or duplicate tweets, as they offer no useful information to the model, I lowercased tweets, performed lemmatization, removed stopwords, special characters, emojis, words written in a non-latin alphabet and urls, since I noticed that the results are better this way. Then, I used the GloVe pretrained Word Embeddings, to take advantage of the relationships between the words. More precisely, I used the ones that are extracted from tweets, since we are dealing with tweets too and I experimented with all the dimensions. I started by finding every word of each tweet in the embeddings dictionary and then I find the average for every tweet (I sum each tweet's words' embeddings and I divide the sum by the dimension of the embeddings), in order to end up with a matrix of $numberOfInstances*dimension$. Then, I split the dataset into batches.
+\\ \\ \\
+\subsection{Models}
+The model I created consists of 3 linear layers, the input size is equal to the dimension of the embeddings and the output size is equal to the number of classes (3). 
+After experimenting with many different combinations of activation functions I found the best results using ReLU and Sigmoid in-between the hidden layers.I did not use an activation function in the output, since I use Cross Entropy as loss function, which combines nn.LogSoftmax() and nn.NLLLoss(). Moreover, I used Batch Normalization, which seemed to ameliorate my results. As far as the optimizer is concerned I used Adam, since it gave much better results than SGD or Adagrad. \\ \\
+The accuracy/precision/recall/F1 results I got were the following, with learning rate=1e-4 and SGD with momentum=0.2 and weight decay=0.01: \\ \\
 \begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-OvO-AUC-macro & 0.846171 & \textbf{0.851729} & 0.846171 \\
-OvO-AUC-weighted & 0.850188 & \textbf{0.856657} & 0.850188\\
-OvR-AUC-macro & 0.855235 & \textbf{0.862937} &	0.855235\\
-OvR-AUC-weighted & 0.854823 & \textbf{0.862879} & 0.854823\\
+& SGD & Adagrad & Adam\\
+Train  & 0.60424 & 0.55884 & \textbf{0.66878} \\
+Validation  & 0.61481 & 0.56310 & \textbf{0.65644}\\
 \end{Vmatrix} \\ \\ \\
-One-vs-One and One-vs-Rest are methods for using binary classification algorithms for multi-class classification. One-vs-Rest splits the dataset into one binary dataset for each class, while One-vs-One approach splits the dataset into one dataset for each class versus every other class.
-The results are satisfying.Plus, I used the mean absolute error metric, even though it is probably not the best and most trustworthy metric for a multiclass classification problem: \\ \\
+Here we observe that there is also something wrong with the SGD and Adagrad results, since the accuracy on the validation set is higher than that of the train set. \\ \\ \\ \\
+Some other results I had to compare, concerning the number of units, hidden layers and activation functions: \\ \\
+$
 \begin{Vmatrix}
-& CountVec & HashingVec & TfidfVec\\
-MAE-Training & 0.3743 & \textbf{0.3083} & 0.3743 \\
-MAE-Test & 0.4421 & \textbf{0.4294} & 0.4421\\
-\end{Vmatrix} \\ \\ \\
-The Hasing Vectorizer seems again to get better results, as the error is the minimum out of the three vectorizers.
-\subsection{Plots}
-In general, in this study, I wanted to experiment as much as possible with Data Visualization, since it is an essential part of Machine Learning.
-First of all, I checked the balance of the dataset.
+& 4-layers-no-activation & 4-layers-activation\\
+Train  & 0.60638 & \textbf{0.69265}  \\
+Validation  & 0.60648 & \textbf{0.64636} \\
+\end{Vmatrix} 
+$
+$
+\begin{Vmatrix}
+& 3-layers-no-activation & 3-layers-activation\\
+Train  & 0.60581 & \textbf{0.66878}  \\
+Validation  & 0.61042 & \textbf{0.65644} \\
+\end{Vmatrix} 
+$
+$
+\begin{Vmatrix}
+& 2-layers-no-activation & 2-layers-activation\\
+Train & 0.60884 & \textbf{0.65228}  \\
+Validation & 0.61481 & \textbf{0.64241} \\
+\end{Vmatrix} 
+$
+\\ \\ \\
+It is obvious that the activation functions (ReLU, Sigmoid) and the Batch Normalization help the model become more expressive, in comparison with using just linear layers. Also, we notice that the model with the 3 layers has the best results for the validation set. The number of units of the hidden layers of the 4-layer model is 256, 128, 64, of the 3-layer model is 128, 64 and of the 2-layer one is 64.
+\\ \\ 
+Using different number of units (in hidden layers) for the 3-layer model: \\ \\
+$
+\begin{Vmatrix}
+& [128,64] &  [256,128] & [64,32]\\
+Train & \textbf{0.66878} & 0.60884 & 0.65568\\
+Validation & \textbf{0.65644} & 0.61481 & 0.64110\\
+\end{Vmatrix} 
+$
+\\ \\ \\
+Also, I experimented with some more activation functions, eg softmin, logsoftmax, or dropout but still the best results were the ones I mentioned before. \\
+The results with or without Dropout: \\ \\
+$
+\begin{Vmatrix}
+& without & after-relu &  after-sigmoid & both\\
+Train & \textbf{0.66878} & 0.65247 & 0.66280 & 0.64920\\
+Validation & \textbf{0.65644} & 0.65512 & 0.65074 & 0.64811\\
+\end{Vmatrix} 
+$ \\ \\ \\
+Testing the best model with different dimensions of word embeddings: \\ \\
+$
+\begin{Vmatrix}
+& 25d & 50d & 100d & 200d\\
+Train & \textbf{0.66878} & 0.73729 & 0.83023 & 0.94861\\
+Validation & \textbf{0.65644} & 0.67134 & 0.67440 & 0.67090\\
+\end{Vmatrix} 
+$ \\ \\ \\
+Even though the results seem better for the three last dimensions of embeddings, the corresponding models are overfitting, which is obvious by the loss and accuracy plots, but also by the fact that the training results are much better than the validation ones. So, my best model uses 25d word embeddings. 
+\subsection{Evaluation - Comparison}
+\\ \\
+Using different metrics, precision, recall, f1 score, accuracy, confusion matrix, roc auc, I was able to determine the quality of my model. From the confusion matrix, I understand that my model makes good enough predictions, since the diagonal has quite bigger numbers. I observe also that it does not predict that well the anti-vaxers, but that is expected, because the anti-vaxers in the data are very few, in comparison to the other classes. \\The confusion matrix ,using the aforementioned model :
 \begin{center}
-\includegraphics[width=100mm]{balance}
+\includegraphics[width=100mm]{confusion2}
 \end{center}
-I have added some plots where the most important words are presented, where we can see the expected words (e.g. covid,pandemic,death,vaccine,jab or numbers that must indicate dates or number of cases).In this way, also, I could make sure that I use efficiently the Vectorizer and the TfIdfTransformer.
+The results as I mentioned them before: \\ \\
+$
+\begin{Vmatrix}
+& Accuracy & Precision &  Recall & F1\\
+Train & \textbf{0.66878} & 0.66878 &0.66878 & 0.66878\\
+Validation & \textbf{0.65644} & 0.65644 & 0.65644 & 0.65644\\
+\end{Vmatrix} 
+$ \\ \\ \\
+One-vs-One ROC AUC scores: \\
+0.783038 (macro), \\
+0.789281 (weighted by prevalence) \\
+\\ \\
+One-vs-Rest ROC AUC scores: \\
+0.796980 (macro), \\
+0.796628 (weighted by prevalence) \\ \\
+And some plots:
 \begin{center}
-\includegraphics[width=100mm]{tfidf}
-\end{center} 
-Also, I plotted the learning curves, along with a performance and scalability curve, to ensure that the model is not overfitting or underfitting and that it performs well, when the instances increase. The training and validation score curves converge and have the expected behavior, when it comes to the first and the third models. However, the Hashing Vectorizer model, despite its efficient results, seems to be overfitting. The conclusion I drew, after trying out a plethora of different configurations,is that without all these hyperparameters that I added to the Hashing Vectorizer, the model does not overfit significantly, but the results are worse than those of the other models. So, in any case, the other two models are preferable and probably the CountVectorizer one is the best, only for the reason that it is faster than the TfIdfVectorizer.
-\subsection{Conclusion}
-In this assignment, I had the opportunity to familiarize with the concepts of data preprocessing, extraction, vectorization, visualization, but also with the process of making plenty of tests and research, in order to achieve the best result. Finally, I faced the challenge of overfitting and I ended up with a decent model, taking into account the relatively small and imbalanced dataset that I used. However, there is much room for improvement.
+\includegraphics[width=100mm]{roc_curve}
+\end{center}
+We observe that the anti-vax class is not that well predicted as the other two classes.
+\begin{center}
+\includegraphics[width=120mm]{loss}
+\end{center}
+\begin{center}
+\includegraphics[width=120mm]{accuracy}
+\end{center}
+We observe that after approximately the 40th epoch, the model does not learn that much, the loss increases and the accuracy descreases, on the validation set.
+In general, however, the behavior of the curves is the expected one.
+
+Finally, I want to note that the results are worse than the ones obtained by the Logistic Regression model of the previous assignment. One reason behind this could be the fact that some words related to Covid-19 are probably not present in the Embeddings. Another reason could be that a more clever neural network is needed (RNN,LSTM,GRU, etc).
+
+
+
+
+
+
 \begin{thebibliography}{9}
 \bibitem{}
-\href{https://www.nltk.org/}{NLTK Documentation}
-\bibitem{}
-\href{https://scikit-learn.org/stable/}{Scikit-Learn Documentation}
-\bibitem{}
-\href{https://kavita-ganesan.com/tfidftransformer-tfidfvectorizer-usage-differences/#.YZPe0mBBwuV}{Vectorization}
-\bibitem{}
-\href{https://www.datacamp.com/community/tutorials/wordcloud-python}{Word Cloud}
+\href{https://pytorch.org/docs/stable/nn.html#non-linear-activations-other}{PyTorch Documentation}
+
 \end{thebibliography}
 \end{document}
