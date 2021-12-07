@@ -75,7 +75,7 @@ In this notebook I trained a neural network, which classifies tweets as Neutral,
 First of all, I performed some preprocessing and feature extraction on the data, similar to the one I had done in the previous assignment. I removed all empty or duplicate tweets, as they offer no useful information to the model, I lowercased tweets, performed lemmatization, removed stopwords, special characters, emojis, words written in a non-latin alphabet and urls, since I noticed that the results are better this way. Then, I used the GloVe pretrained Word Embeddings, to take advantage of the relationships between the words. More precisely, I used the ones that are extracted from tweets, since we are dealing with tweets too and I experimented with all the dimensions. I started by finding every word of each tweet in the embeddings dictionary and then I find the average for every tweet (I sum each tweet's words' embeddings and I divide the sum by the dimension of the embeddings), in order to end up with a matrix of $numberOfInstances*dimension$. Then, I split the dataset into batches.
 \\ \\ \\
 \subsection{Models}
-The model I created consists of 3 linear layers, the input size is equal to the dimension of the embeddings and the output size is equal to the number of classes (3). 
+The best model I created consists of 3 linear layers, the input size is equal to the dimension of the embeddings and the output size is equal to the number of classes (3). 
 After experimenting with many different combinations of activation functions I found the best results using ReLU and Sigmoid in-between the hidden layers.I did not use an activation function in the output, since I use Cross Entropy as loss function, which combines nn.LogSoftmax() and nn.NLLLoss(). Moreover, I used Batch Normalization, which seemed to ameliorate my results. As far as the optimizer is concerned I used Adam, since it gave much better results than SGD or Adagrad. \\ \\
 The accuracy/precision/recall/F1 results I got were the following, with learning rate=1e-4 and SGD with momentum=0.2 and weight decay=0.01: \\ \\
 \begin{Vmatrix}
@@ -83,7 +83,7 @@ The accuracy/precision/recall/F1 results I got were the following, with learning
 Train  & 0.60424 & 0.55884 & \textbf{0.66878} \\
 Validation  & 0.61481 & 0.56310 & \textbf{0.65644}\\
 \end{Vmatrix} \\ \\ \\
-Here we observe that there is also something wrong with the SGD and Adagrad results, since the accuracy on the validation set is higher than that of the train set. \\ \\ \\ \\
+Here we observe that there is also something wrong with the SGD and Adagrad results, since the accuracy on the validation set is higher than that of the train set. \\ \\ 
 Some other results I had to compare, concerning the number of units, hidden layers and activation functions: \\ \\
 $
 \begin{Vmatrix}
@@ -118,7 +118,7 @@ Validation & \textbf{0.65644} & 0.61481 & 0.64110\\
 \end{Vmatrix} 
 $
 \\ \\ \\
-Also, I experimented with some more activation functions, eg softmin, logsoftmax, or dropout but still the best results were the ones I mentioned before. \\
+Also, I experimented with some more activation functions, eg softmin, logsoftmax, or dropout, and higher or lower learning rate but still the best results were the ones I mentioned before.  \\
 The results with or without Dropout: \\ \\
 $
 \begin{Vmatrix}
@@ -136,6 +136,15 @@ Validation & \textbf{0.65644} & 0.67134 & 0.67440 & 0.67090\\
 \end{Vmatrix} 
 $ \\ \\ \\
 Even though the results seem better for the three last dimensions of embeddings, the corresponding models are overfitting, which is obvious by the loss and accuracy plots, but also by the fact that the training results are much better than the validation ones. So, my best model uses 25d word embeddings. 
+
+In the notebook I have also included another model. The main difference this model has from the first one is that it contains one more layer, it uses Dropout and LogSoftmax on the output, because the used loss function is NLLLoss. The results are similar to the ones of my best model: \\ \\
+$
+\begin{Vmatrix}
+& Accuracy & Precision &  Recall & F1\\
+Train & \textbf{0.65499} & 0.65499 & 0.65499 & 0.65499\\
+Validation & \textbf{0.65030} & 0.65030 & 0.65030 & 0.65030\\
+\end{Vmatrix} 
+$ \\ \\ \\
 \subsection{Evaluation - Comparison}
 \\ \\
 Using different metrics, precision, recall, f1 score, accuracy, confusion matrix, roc auc, I was able to determine the quality of my model. From the confusion matrix, I understand that my model makes good enough predictions, since the diagonal has quite bigger numbers. I observe also that it does not predict that well the anti-vaxers, but that is expected, because the anti-vaxers in the data are very few, in comparison to the other classes. \\The confusion matrix ,using the aforementioned model :
@@ -162,21 +171,17 @@ And some plots:
 \includegraphics[width=100mm]{roc_curve}
 \end{center}
 We observe that the anti-vax class is not that well predicted as the other two classes.
+However, the curves in general show that the model distinguishes the classes, since they lean towards the top left corner (TPR).
 \begin{center}
-\includegraphics[width=120mm]{loss}
+\includegraphics[width=100mm]{loss}
 \end{center}
 \begin{center}
-\includegraphics[width=120mm]{accuracy}
+\includegraphics[width=100mm]{accuracy}
 \end{center}
 We observe that after approximately the 40th epoch, the model does not learn that much, the loss increases and the accuracy descreases, on the validation set.
-In general, however, the behavior of the curves is the expected one.
+In general, however, the behavior of the curves is the expected one.That means that the accuracy increases and the loss decreases as the model learns.
 
-Finally, I want to note that the results are worse than the ones obtained by the Logistic Regression model of the previous assignment. One reason behind this could be the fact that some words related to Covid-19 are probably not present in the Embeddings. Another reason could be that a more clever neural network is needed (RNN,LSTM,GRU, etc).
-
-
-
-
-
+Finally, I want to note that the results are sligthly worse than the ones obtained by the Logistic Regression model of the previous assignment. One reason behind this could be the fact that some words related to Covid-19 are probably not present in the Embeddings. Another reason could be that a more clever neural network is needed (RNN,LSTM,GRU, etc).
 
 \begin{thebibliography}{9}
 \bibitem{}
