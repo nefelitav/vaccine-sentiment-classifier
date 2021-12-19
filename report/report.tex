@@ -76,107 +76,114 @@ First of all, I performed some preprocessing and feature extraction on the data,
 \\ \\ \\
 \subsection{Models}
 The best model I created consists of 3 linear layers, the input size is equal to the dimension of the embeddings and the output size is equal to the number of classes (3). 
-After experimenting with many different combinations of activation functions I found the best results using ReLU and Sigmoid in-between the hidden layers.I did not use an activation function in the output, since I use Cross Entropy as loss function, which combines nn.LogSoftmax() and nn.NLLLoss(). Moreover, I used Batch Normalization, which seemed to ameliorate my results. As far as the optimizer is concerned I used Adam, since it gave much better results than SGD or Adagrad. \\ \\
-The accuracy/precision/recall/F1 results I got were the following, with learning rate=1e-4 and SGD with momentum=0.2 and weight decay=0.01: \\ \\
+After experimenting with many different combinations of activation functions I found the best results using ReLU and Sigmoid in-between the hidden layers.I did not use an activation function in the output, since I use Cross Entropy as loss function, which combines nn.LogSoftmax() and nn.NLLLoss(). Moreover, I used Batch Normalization, which seemed to ameliorate my results. As far as the optimizer is concerned I used Adam, since it gave much better results than SGD or Adagrad.\\ \\
+In the following tables I will present some comparisons I made in order to find my most efficient model.
+The accuracy/precision/recall/F1 results I got were the following, with learning rate=1e-4 and SGD with momentum=0.2 and weight decay=0.01 with 3 layers(186,64 units): \\ \\
 \begin{Vmatrix}
 & SGD & Adagrad & Adam\\
-Train  & 0.60424 & 0.55884 & \textbf{0.66878} \\
-Validation  & 0.61481 & 0.56310 & \textbf{0.65644}\\
+Train  & 0.5014 & 0.5529 & \textbf{0.6682} \\
+Validation  & 0.5157 & 0.5543 & \textbf{0.6498}\\
 \end{Vmatrix} \\ \\ \\
 Here we observe that there is also something wrong with the SGD and Adagrad results, since the accuracy on the validation set is higher than that of the train set. \\ \\ 
 Some other results I had to compare, concerning the number of units, hidden layers and activation functions: \\ \\
 $
 \begin{Vmatrix}
 & 4-layers-no-activation & 4-layers-activation\\
-Train  & 0.60638 & \textbf{0.69265}  \\
-Validation  & 0.60648 & \textbf{0.64636} \\
+Train  & 0.6076 & \textbf{0.6952}  \\
+Validation  & 0.6143 & \textbf{0.6498} \\
 \end{Vmatrix} 
 $
 $
 \begin{Vmatrix}
 & 3-layers-no-activation & 3-layers-activation\\
-Train  & 0.60581 & \textbf{0.66878}  \\
-Validation  & 0.61042 & \textbf{0.65644} \\
+Train  & 0.60581 & \textbf{0.6682}  \\
+Validation  & 0.61042 & \textbf{0.6498} \\
 \end{Vmatrix} 
 $
 $
 \begin{Vmatrix}
 & 2-layers-no-activation & 2-layers-activation\\
-Train & 0.60884 & \textbf{0.65228}  \\
-Validation & 0.61481 & \textbf{0.64241} \\
+Train & 0.6064 & \textbf{0.6563}  \\
+Validation & 0.6152 & \textbf{0.6428} \\
 \end{Vmatrix} 
 $
 \\ \\ \\
-It is obvious that the activation functions (ReLU, Sigmoid) and the Batch Normalization help the model become more expressive, in comparison with using just linear layers. Also, we notice that the model with the 3 layers has the best results for the validation set. The number of units of the hidden layers of the 4-layer model is 256, 128, 64, of the 3-layer model is 128, 64 and of the 2-layer one is 64.
+It is obvious that the activation functions (ReLU, Sigmoid) and the Batch Normalization help the model become more expressive, in comparison with using just linear layers. Also, we notice that the model with the 3 layers has the best results for the validation set, while the one with the 4 layers seems to be overfitting. The number of units of the hidden layers of the 4-layer model is 256, 128, 64, of the 3-layer model is 128, 64 and of the 2-layer one is 64.
 \\ \\ 
 Using different number of units (in hidden layers) for the 3-layer model: \\ \\
 $
 \begin{Vmatrix}
 & [128,64] &  [256,128] & [64,32]\\
-Train & \textbf{0.66878} & 0.60884 & 0.65568\\
-Validation & \textbf{0.65644} & 0.61481 & 0.64110\\
+Train & 0.6682 & 0.6815 & 0.6643\\
+Validation & 0.6498 & 0.6419 & \textbf{0.6520}\\
 \end{Vmatrix} 
 $
 \\ \\ \\
-Also, I experimented with some more activation functions, eg softmin, logsoftmax, or dropout, and higher or lower learning rate but still the best results were the ones I mentioned before.  \\
+So, the one one with the least units is the best one.
+Also, I experimented with some more activation functions, eg softmin, logsoftmax, and higher or lower learning rate but still the best results were the ones I mentioned before.  \\
 The results with or without Dropout: \\ \\
 $
 \begin{Vmatrix}
 & without & after-relu &  after-sigmoid & both\\
-Train & \textbf{0.66878} & 0.65247 & 0.66280 & 0.64920\\
-Validation & \textbf{0.65644} & 0.65512 & 0.65074 & 0.64811\\
+Train & 0.6643 & 0.6436 & 0.6504 & 0.6415\\
+Validation & 0.6520 & \textbf{0.6538} & 0.6411 & 0.6419\\
 \end{Vmatrix} 
 $ \\ \\ \\
+Here, we notice that even though the model that uses Dropout after ReLU has the best score, it is overfitting, since the validation score is higher than the training score, which might not be necessarily a negative thing, but the first one is almost equally good, so it is preferred. \\ \\
 Testing the best model with different dimensions of word embeddings: \\ \\
 $
 \begin{Vmatrix}
 & 25d & 50d & 100d & 200d\\
-Train & \textbf{0.66878} & 0.73729 & 0.83023 & 0.94861\\
-Validation & \textbf{0.65644} & 0.67134 & 0.67440 & 0.67090\\
+Train & 0.6643 & 0.7109 & 0.7818 & 0.8681\\
+Validation & 0.6520 & 0.6660 & \textbf{0.6822} & 0.6770\\
 \end{Vmatrix} 
 $ \\ \\ \\
-Even though the results seem better for the three last dimensions of embeddings, the corresponding models are overfitting, which is obvious by the loss and accuracy plots, but also by the fact that the training results are much better than the validation ones. So, my best model uses 25d word embeddings. 
+Even though, the model that uses 100d embeddings seems to be the best one, the epochs vs loss and epochs vs accuracy curves indicate that it is overfitting.
+\begin{center}
+\includegraphics[width=100mm]{images/overfitting.png}
+\end{center}
+So, my best model uses 25d word embeddings and does not overfit. \\ \\
 
 In the notebook I have also included another model. The main difference this model has from the first one is that it contains one more layer, it uses Dropout and LogSoftmax on the output, because the used loss function is NLLLoss. The results are similar to the ones of my best model: \\ \\
 $
 \begin{Vmatrix}
 & Accuracy & Precision &  Recall & F1\\
-Train & \textbf{0.65499} & 0.65499 & 0.65499 & 0.65499\\
-Validation & \textbf{0.65030} & 0.65030 & 0.65030 & 0.65030\\
+Train & \textbf{0.6644} & 0.6644 & 0.6644 & 0.6644\\
+Validation & \textbf{0.6560} & 0.6560 & 0.6560 & 0.6560\\
 \end{Vmatrix} 
 $ \\ \\ \\
 \subsection{Evaluation - Comparison}
 \\ \\
 Using different metrics, precision, recall, f1 score, accuracy, confusion matrix, roc auc, I was able to determine the quality of my model. From the confusion matrix, I understand that my model makes good enough predictions, since the diagonal has quite bigger numbers. I observe also that it does not predict that well the anti-vaxers, but that is expected, because the anti-vaxers in the data are very few, in comparison to the other classes. \\The confusion matrix ,using the aforementioned model :
 \begin{center}
-\includegraphics[width=100mm]{confusion2}
+\includegraphics[width=100mm]{images/confusion.png}
 \end{center}
 The results as I mentioned them before: \\ \\
 $
 \begin{Vmatrix}
 & Accuracy & Precision &  Recall & F1\\
-Train & \textbf{0.66878} & 0.66878 &0.66878 & 0.66878\\
-Validation & \textbf{0.65644} & 0.65644 & 0.65644 & 0.65644\\
+Train & \textbf{0.6643} & 0.6643 & 0.6643 & 0.6643\\
+Validation & \textbf{0.6520} & 0.6520 & 0.6520 & 0.6520\\
 \end{Vmatrix} 
 $ \\ \\ \\
 One-vs-One ROC AUC scores: \\
-0.783038 (macro), \\
-0.789281 (weighted by prevalence) \\
+0.778982 (macro), \\
+0.785546 (weighted by prevalence) \\
 \\ \\
 One-vs-Rest ROC AUC scores: \\
-0.796980 (macro), \\
-0.796628 (weighted by prevalence) \\ \\
+0.793916 (macro), \\
+0.793266 (weighted by prevalence) \\ \\
 And some plots:
 \begin{center}
-\includegraphics[width=100mm]{roc_curve}
+\includegraphics[width=100mm]{images/roc.png}
 \end{center}
 We observe that the anti-vax class is not that well predicted as the other two classes.
 However, the curves in general show that the model distinguishes the classes, since they lean towards the top left corner (TPR).
 \begin{center}
-\includegraphics[width=100mm]{loss}
+\includegraphics[width=100mm]{images/loss.png}
 \end{center}
 \begin{center}
-\includegraphics[width=100mm]{accuracy}
+\includegraphics[width=100mm]{images/accuracy}
 \end{center}
 We observe that after approximately the 40th epoch, the model does not learn that much, the loss increases and the accuracy descreases, on the validation set.
 In general, however, the behavior of the curves is the expected one.That means that the accuracy increases and the loss decreases as the model learns.
