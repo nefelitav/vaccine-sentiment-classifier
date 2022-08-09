@@ -7,3 +7,12 @@ The models and their best accuracy scores:
 - LSTM: 0.7050
 - GRU: 0.7063
 - Bert pretrained model: 0.7751
+
+Concepts examined:
+- Data processing
+- Feature extraction
+- Data visualization
+- Skip Connections
+- Attention layer
+- Activation functions
+- Loss functions
